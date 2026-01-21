@@ -1,3 +1,3 @@
-def test_open_main_page(page, base_url):
-    page.goto(base_url)
-    assert "The Internet" in page.title()
+def test_open_main_page(main_page):
+    main_page.open()
+    main_page.should_have_title()
