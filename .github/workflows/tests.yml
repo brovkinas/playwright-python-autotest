@@ -36,7 +36,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest
+          pytest --alluredir=allure-results
 
       # -------------------------
       # Upload RAW artifacts
@@ -65,7 +65,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y default-jre
-          curl -Ls https://github.com/allure-framework/allure2/releases/latest/download/allure-2.27.0.tgz | sudo tar -xz -C /opt/
+          curl -Ls https://github.com/allure-framework/allure2/releases/download/2.36.0/allure-2.36.0.tgz | sudo tar -xz -C /opt/
           sudo ln -sf /opt/allure-2.27.0/bin/allure /usr/bin/allure
           allure --version
 
