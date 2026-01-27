@@ -15,8 +15,9 @@ __pycache__/
 allure-results/
 allure-report/
 
-# Local test results
+# Local test artifacts
 test-results/
+logs/
 
 # MacOS
 .DS_Store
