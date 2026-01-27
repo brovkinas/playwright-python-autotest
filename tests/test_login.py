@@ -16,7 +16,7 @@ def test_success_login(login_page):
 def test_invalid_username_login(login_page):
     login_page.open()
     login_page.login('tomsmithh', 'SuperSecretPassword!')
-    login_page.should_have_invalid_username_error
+    login_page.should_have_invalid_username_error()
 
 
 @allure.epic("Authentication")
@@ -25,4 +25,4 @@ def test_invalid_username_login(login_page):
 def test_invalid_password_login(login_page):
     login_page.open()
     login_page.login('tomsmith', 'SuperSecretPassword!!')
-    login_page.should_have_invalid_password_error
+    login_page.should_have_invalid_password_error()
