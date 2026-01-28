@@ -18,27 +18,31 @@ class LoginPage(BasePage):
     @allure.step('Open login page')
     def open(self):
         super().open(self.URL)
+        expect(self.page.locator(self.LOGIN_BUTTON)).to_be_visible()
 
     @allure.step('Login with username: {username} and password: {password}')
     def login(self, username: str, password: str):
-        self.page.fill(self.USERNAME_INPUT, username)
-        self.page.fill(self.PASSWORD_INPUT, password)
-        self.page.click(self.LOGIN_BUTTON)
+        self._fill(self.USERNAME_INPUT, username)
+        self._fill(self.PASSWORD_INPUT, password)
+        self._click(self.LOGIN_BUTTON)
 
     @allure.step('Verify successful login')
     def should_be_logged_in(self):
+        expect(self.page.locator(self.FLASH_MESSAGE)).to_be_visible()
         expect(self.page.locator(self.FLASH_MESSAGE)).to_contain_text(
             self.SUCCESS_LOGIN_TEXT
         )
 
     @allure.step('Verify invalid username')
     def should_have_invalid_username_error(self):
+        expect(self.page.locator(self.FLASH_MESSAGE)).to_be_visible()
         expect(self.page.locator(self.FLASH_MESSAGE)).to_contain_text(
             self.INVALID_USERNAME_TEXT
         )
 
     @allure.step('Verify invalid password')
     def should_have_invalid_password_error(self):
+        expect(self.page.locator(self.FLASH_MESSAGE)).to_be_visible()
         expect(self.page.locator(self.FLASH_MESSAGE)).to_contain_text(
             self.INVALID_PASSWORD_TEXT
         )
