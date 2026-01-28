@@ -3,37 +3,41 @@ import os
 from datetime import datetime
 
 LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok=True)
 
 
 def setup_logger():
-    # ROOT logger
-    root_logger = logging.getLogger()
+    # Create log dir if not exists
+    os.makedirs(LOG_DIR, exist_ok=True)
 
-    # remove handlers pytest
-    for h in list(root_logger.handlers):
-        root_logger.removeHandler(h)
+    # Autotests logger
+    logger = logging.getLogger("autotests")
 
-    root_logger.setLevel(logging.DEBUG)
+    if logger.handlers:
+        return logger
+
+    logger.propagate = False
+    logger.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter(
         "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
     )
 
-    # Console
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    console.setFormatter(formatter)
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
 
-    # File
-    file_name = f"{LOG_DIR}/run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-    file_handler = logging.FileHandler(file_name, encoding="utf-8", mode="a")
+    # File handler
+    log_file_name = os.path.join(
+        LOG_DIR, f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    )
+    file_handler = logging.FileHandler(log_file_name, encoding="utf-8", mode="a")
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
 
-    root_logger.addHandler(console)
-    root_logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
 
-    root_logger.info("=== ROOT LOGGER READY ===")
+    logger.info("=== AUTOTESTS LOGGER READY ===")
 
-    return root_logger
+    return logger
