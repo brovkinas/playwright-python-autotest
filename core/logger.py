@@ -9,7 +9,6 @@ def setup_logger():
     # Create log dir if not exists
     os.makedirs(LOG_DIR, exist_ok=True)
 
-    # Autotests logger
     logger = logging.getLogger("autotests")
 
     if logger.handlers:
