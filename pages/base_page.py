@@ -24,3 +24,11 @@ class BasePage:
         element = self.page.locator(locator)
         expect(element).to_be_enabled()
         element.click()
+
+    def attach_page_source(self):
+        html = self.page.content()
+        allure.attach(
+            html,
+            name="Page source",
+            attachment_type=allure.attachment_type.HTML,
+        )
