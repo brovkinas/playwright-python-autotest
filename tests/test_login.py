@@ -27,5 +27,5 @@ def test_invalid_username_login(pages):
 def test_invalid_password_login(pages):
     login_page = pages.create("login")
     login_page.open()
-    login_page.login('tomsmith', 'wrong-password1!')
+    login_page.login('tomsmith', 'SuperSecretPassword!')
     login_page.should_have_invalid_password_error()
