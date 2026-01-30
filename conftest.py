@@ -1,8 +1,7 @@
 import pytest
 import logging
 
-from pages.login_page import LoginPage
-from pages.main_page import MainPage
+from pages.factory import PagesFactory
 from core.logger import setup_logger
 
 pytest_plugins = ["pytest_plugins.allure_hooks"]
@@ -13,14 +12,9 @@ def base_url(request):
     return request.config.getoption("--base-url")
 
 
-@pytest.fixture(scope="function")
-def main_page(page, base_url):
-    return MainPage(page, base_url)
-
-
-@pytest.fixture(scope="function")
-def login_page(page, base_url):
-    return LoginPage(page, base_url)
+@pytest.fixture(scope="function", autouse=False)
+def pages(page, base_url):
+    return PagesFactory(page, base_url)
 
 
 @pytest.fixture(scope="session", autouse=True)

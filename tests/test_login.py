@@ -4,7 +4,8 @@ import allure  # noqa
 @allure.epic("Authentication")
 @allure.feature("Login by username and password")
 @allure.story("Successful Login by username and password")
-def test_success_login(login_page):
+def test_success_login(pages):
+    login_page = pages.create("login")
     try:
         login_page.open()
         login_page.login('tomsmith', 'SuperSecretPassword!')
@@ -17,7 +18,8 @@ def test_success_login(login_page):
 @allure.epic("Authentication")
 @allure.feature("Login by username and password")
 @allure.story("Username Login error")
-def test_invalid_username_login(login_page):
+def test_invalid_username_login(pages):
+    login_page = pages.create("login")
     try:
         login_page.open()
         login_page.login('tomsmithh', 'SuperSecretPassword!')
@@ -30,7 +32,8 @@ def test_invalid_username_login(login_page):
 @allure.epic("Authentication")
 @allure.feature("Login by username and password")
 @allure.story("Password Login error")
-def test_invalid_password_login(login_page):
+def test_invalid_password_login(pages):
+    login_page = pages.create("login")
     try:
         login_page.open()
         login_page.login('tomsmith', 'SuperSecretPassword!1')
