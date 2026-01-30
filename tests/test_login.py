@@ -17,7 +17,7 @@ def test_success_login(pages):
 def test_invalid_username_login(pages):
     login_page = pages.create("login")
     login_page.open()
-    login_page.login('tomsmithh', 'SuperSecretPassword!')
+    login_page.login('wrong-username', 'SuperSecretPassword!')
     login_page.should_have_invalid_username_error()
 
 
@@ -27,5 +27,5 @@ def test_invalid_username_login(pages):
 def test_invalid_password_login(pages):
     login_page = pages.create("login")
     login_page.open()
-    login_page.login('tomsmith', 'SuperSecretPassword!1')
+    login_page.login('tomsmith', 'wrong-password1!')
     login_page.should_have_invalid_password_error()

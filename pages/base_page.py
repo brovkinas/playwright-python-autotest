@@ -19,7 +19,9 @@ class BasePage:
 
     @allure.step('Open url: {url}')
     def open(self, url: str = ''):
-        self.page.goto(f'{self.base_url}{url}', wait_until='networkidle', timeout=60000)
+        self.page.goto(
+            f'{self.base_url}{url}', wait_until='domcontentloaded', timeout=30000
+        )
 
     @allure.step('Check page title contains: {expected_title}')
     def should_have_title(self, expected_title: str):
