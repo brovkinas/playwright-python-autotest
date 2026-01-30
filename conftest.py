@@ -37,3 +37,14 @@ def test_context(request):
     yield
 
     logger.info(f"Finish test: {nodeid}")
+
+
+@pytest.fixture(scope="function", autouse=True)
+def bind_page(request, page):
+    """
+    Привязывает playwright page к pytest item
+    для использования в hooks
+    """
+    request.node.page = page
+
+    yield

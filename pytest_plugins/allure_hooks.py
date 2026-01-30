@@ -1,7 +1,11 @@
+import logging
+
 import pytest
 import allure
 
 from utils.helpers import nodeid_to_dir
+
+logger = logging.getLogger("autotests")
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -10,6 +14,34 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
+    if report.when == 'call':
+
+        page = getattr(item, "page", None)
+
+        if page:
+            try:
+                # page source runtime attach
+                allure.attach(
+                    page.content(),
+                    name="Page source (runtime)",
+                    attachment_type=allure.attachment_type.HTML,
+                )
+
+                # screenshot runtime attach
+                allure.attach(
+                    page.screenshot(),
+                    name="Screenshot (runtime)",
+                    attachment_type=allure.attachment_type.PNG,
+                )
+
+            except Exception:
+                logger.exception(
+                    f"Failed to attach runtime artifacts " f"for test: {item.nodeid}"
+                )
+
+        else:
+            logger.error(f"[HOOK] Playwright page not found for test: {item.nodeid}")
+
     if report.when == "teardown":
 
         artifacts_dir = nodeid_to_dir(item.nodeid)
@@ -17,7 +49,7 @@ def pytest_runtest_makereport(item, call):
         if not artifacts_dir.exists():
             return
 
-        # Video
+        # Video teardown attach
         for video in artifacts_dir.glob("*.webm"):
 
             if video.stat().st_size > 0:
@@ -25,21 +57,13 @@ def pytest_runtest_makereport(item, call):
                     video, name="Video", attachment_type=allure.attachment_type.MP4
                 )
 
-        # Screenshot
-        for screenshot in artifacts_dir.glob("test-*.png"):
+        # Traces teardown attach
+        # trace = artifacts_dir / "trace.zip"
 
-            allure.attach.file(
-                screenshot,
-                name="Screenshot",
-                attachment_type=allure.attachment_type.PNG,
-            )
-
-        # Trace
-        trace = artifacts_dir / "trace.zip"
-
-        if trace.exists():
-            allure.attach.file(
-                trace,
-                name="Traces in .html => SaveAs .zip file",
-                attachment_type=allure.attachment_type.HTML,
-            )
+        for trace in artifacts_dir.glob("*.zip"):
+            if trace.exists():
+                allure.attach.file(
+                    trace,
+                    name="Traces in .html => SaveAs .zip file",
+                    attachment_type=allure.attachment_type.HTML,
+                )
