@@ -11,6 +11,6 @@ class MainPage(BasePage):
     def open(self):
         super().open(self.URL)
 
-    @allure.step('Verify main page title')
+    @allure.step(f'Main page should have title "{EXPECTED_TITLE}"')
     def should_have_title(self):
         super().should_have_title(self.EXPECTED_TITLE)

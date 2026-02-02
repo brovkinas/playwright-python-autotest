@@ -1,7 +1,7 @@
 import pytest
 import logging
 
-from pages.factory import PagesFactory
+from pages.page_factory.factory import PagesFactory
 from core.logger import setup_logger
 
 pytest_plugins = ["pytest_plugins.allure_hooks"]
