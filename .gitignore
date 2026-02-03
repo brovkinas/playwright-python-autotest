@@ -16,7 +16,7 @@ allure-results/
 allure-report/
 
 # Local test artifacts
-test-results/
+test-results*/
 logs/
 
 # MacOS

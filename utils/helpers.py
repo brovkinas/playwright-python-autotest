@@ -1,4 +1,5 @@
 from pathlib import Path
+from _pytest.nodes import Item
 
 
 def project_root(
@@ -19,9 +20,11 @@ def project_root(
     raise RuntimeError("Project root not found")
 
 
-def nodeid_to_dir(nodeid: str) -> Path:
+def nodeid_to_dir_path(item: Item) -> Path:
 
-    name = nodeid
+    output_dir = item.config._playwright_output_dir
+
+    name = item.nodeid
     name = (
         name.replace("::", "-")
         .replace("/", "-")
@@ -31,4 +34,4 @@ def nodeid_to_dir(nodeid: str) -> Path:
         .replace("]", "")
     )
 
-    return Path("test-results") / name
+    return Path(output_dir) / name

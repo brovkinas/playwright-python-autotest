@@ -27,7 +27,6 @@ def test_invalid_username_login(pages):
 @allure.feature("Login by username and password")
 @allure.story("Password Login error")
 def test_invalid_password_login(pages):
-    # login_page = pages.create("login")
     login_page = pages.create(PageType.LOGIN)
     login_page.open()
     login_page.login('tomsmith', 'invalid_SuperSecretPassword!')

@@ -17,6 +17,7 @@ class PagesFactory:
 
     def create(self, page_type: PageType):
         try:
-            return PAGE_REGISTRY[page_type](self.page, self.base_url)
+            page_class = PAGE_REGISTRY[page_type]
+            return page_class(self.page, self.base_url)
         except KeyError:
             raise ValueError(f'"{page_type}" не зарегистрирован в PAGE_REGISTRY')

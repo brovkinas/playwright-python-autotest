@@ -4,7 +4,7 @@ import logging
 from pages.page_factory.factory import PagesFactory
 from core.logger import setup_logger
 
-pytest_plugins = ["pytest_plugins.allure_hooks"]
+pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
 
 
 @pytest.fixture(scope="session")

@@ -1,9 +1,9 @@
+import allure  # noqa
 import logging
 
 import pytest
-import allure
 
-from utils.helpers import nodeid_to_dir
+from utils.helpers import nodeid_to_dir_path
 
 logger = logging.getLogger("autotests")
 
@@ -36,7 +36,7 @@ def pytest_runtest_makereport(item, call):
 
             except Exception:
                 logger.exception(
-                    f"Failed to attach runtime artifacts " f"for test: {item.nodeid}"
+                    f"Failed to attach runtime artifacts for test: {item.nodeid}"
                 )
 
         else:
@@ -44,7 +44,7 @@ def pytest_runtest_makereport(item, call):
 
     if report.when == "teardown":
 
-        artifacts_dir = nodeid_to_dir(item.nodeid)
+        artifacts_dir = nodeid_to_dir_path(item)
 
         if not artifacts_dir.exists():
             return
@@ -58,8 +58,6 @@ def pytest_runtest_makereport(item, call):
                 )
 
         # Traces teardown attach
-        # trace = artifacts_dir / "trace.zip"
-
         for trace in artifacts_dir.glob("*.zip"):
             if trace.exists():
                 allure.attach.file(
