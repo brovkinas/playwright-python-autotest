@@ -38,7 +38,7 @@ jobs:
       - name: Run tests
         continue-on-error: true
         run: |
-          pytest --alluredir=allure-results
+          pytest
 
       # -------------------------
       # Upload RAW artifacts
