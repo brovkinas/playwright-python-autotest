@@ -7,7 +7,7 @@ from core.logger import setup_logger
 pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=False)
 def base_url(request):
     return request.config.getoption("--base-url")
 

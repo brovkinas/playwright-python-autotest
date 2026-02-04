@@ -1,5 +1,6 @@
 from pathlib import Path
 from _pytest.nodes import Item
+from core.stash_keys import PW_OUTPUT_DIR
 
 
 def project_root(
@@ -22,7 +23,7 @@ def project_root(
 
 def nodeid_to_dir_path(item: Item) -> Path:
 
-    output_dir = item.config._playwright_output_dir
+    output_dir = item.config.stash[PW_OUTPUT_DIR]
 
     name = item.nodeid
     name = (

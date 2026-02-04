@@ -1,7 +1,6 @@
+import pytest
 import allure  # noqa
 import logging
-
-import pytest
 
 from utils.helpers import nodeid_to_dir_path
 
@@ -18,29 +17,22 @@ def pytest_runtest_makereport(item, call):
 
         page = getattr(item, "page", None)
 
-        if page:
-            try:
-                # page source runtime attach
-                allure.attach(
-                    page.content(),
-                    name="Page source (runtime)",
-                    attachment_type=allure.attachment_type.HTML,
-                )
+        if not page:
+            return
 
-                # screenshot runtime attach
-                allure.attach(
-                    page.screenshot(),
-                    name="Screenshot (runtime)",
-                    attachment_type=allure.attachment_type.PNG,
-                )
+        # page source runtime attach
+        allure.attach(
+            page.content(),
+            name="Page source (runtime)",
+            attachment_type=allure.attachment_type.HTML,
+        )
 
-            except Exception:
-                logger.exception(
-                    f"Failed to attach runtime artifacts for test: {item.nodeid}"
-                )
-
-        else:
-            logger.error(f"[HOOK] Playwright page not found for test: {item.nodeid}")
+        # screenshot runtime attach
+        allure.attach(
+            page.screenshot(),
+            name="Screenshot (runtime)",
+            attachment_type=allure.attachment_type.PNG,
+        )
 
     if report.when == "teardown":
 
