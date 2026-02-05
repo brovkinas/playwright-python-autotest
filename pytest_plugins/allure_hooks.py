@@ -2,8 +2,6 @@ import pytest
 import allure  # noqa
 import logging
 
-from utils.helpers import nodeid_to_dir_path
-
 logger = logging.getLogger("autotests")
 
 
@@ -13,7 +11,7 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
-    if report.when == 'call':
+    if report.when == "call":
 
         item.stash["test_failed"] = report.failed or report.skipped
 
