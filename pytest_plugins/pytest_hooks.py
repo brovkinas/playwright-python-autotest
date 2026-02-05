@@ -1,15 +1,15 @@
 import os
-import time
-
 import pytest
+
 from core.stash_keys import PW_OUTPUT_DIR
+from datetime import datetime
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
 
     if not hasattr(config, "workerinput"):
-        timestamp = str(int(time.time()))
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         pw_output_dir = f"test-results-{timestamp}"
 
         os.environ["PW_OUTPUT_DIR"] = pw_output_dir
