@@ -17,39 +17,76 @@ concurrency:
 
 jobs:
   tests:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-22.04
 
     steps:
+      # -------------------------
+      # Checkout source
+      # -------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # -------------------------
+      # Checkout gh-pages (history)
+      # -------------------------
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # -------------------------
+      # Setup Python
+      # -------------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
+      # -------------------------
+      # Install dependencies
+      # -------------------------
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install --with-deps
 
+      # -------------------------
+      # Run tests
+      # -------------------------
       - name: Run tests
         continue-on-error: true
         run: |
-          pytest
+          pytest --alluredir=allure-results
+
+      # -------------------------
+      # Copy history for Trends
+      # -------------------------
+      - name: Copy Allure history
+        if: always()
+        run: |
+          if [ -d "gh-pages/history" ]; then
+            echo "History found. Copying..."
+            mkdir -p allure-results/history
+            cp -r gh-pages/history/* allure-results/history
+          else
+            echo "No previous history found"
+          fi
 
       # -------------------------
       # Upload RAW artifacts
       # -------------------------
-
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
           path: allure-results
+          retention-days: 7
 
       - name: Upload Playwright artifacts
         if: always()
@@ -57,11 +94,11 @@ jobs:
         with:
           name: playwright-artifacts
           path: test-results-*
+          retention-days: 7
 
       # -------------------------
-      # Install Allure
+      # Install Allure CLI
       # -------------------------
-
       - name: Install Allure CLI
         if: always()
         run: |
@@ -74,14 +111,10 @@ jobs:
       # -------------------------
       # Generate Allure report
       # -------------------------
-
       - name: Generate Allure report
         if: always()
         run: |
-          ls -la
-          ls -la allure-results
           allure generate allure-results -o allure-report --clean
-          ls -la allure-report
 
       - name: Upload Allure HTML report
         if: always()
@@ -89,11 +122,11 @@ jobs:
         with:
           name: allure-report
           path: allure-report
+          retention-days: 7
 
       # -------------------------
       # Deploy to GitHub Pages
       # -------------------------
-
       - name: Setup Pages
         if: always()
         uses: actions/configure-pages@v5
