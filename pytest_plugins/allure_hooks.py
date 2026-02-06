@@ -1,8 +1,5 @@
 import pytest
 import allure  # noqa
-import logging
-
-logger = logging.getLogger("autotests")
 
 
 @pytest.hookimpl(hookwrapper=True)
