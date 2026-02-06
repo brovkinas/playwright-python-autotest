@@ -13,7 +13,7 @@ def pytest_runtest_makereport(item, call):
 
     if report.when == "call":
 
-        item.stash["test_failed"] = report.failed or report.skipped
+        item.stash["test_failed"] = report.failed
 
         page = getattr(item, "page", None)
 
