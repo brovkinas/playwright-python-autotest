@@ -29,7 +29,6 @@ def nodeid_to_dir_path(item: Item) -> Path:
     name = (
         name.replace("::", "-")
         .replace("/", "-")
-        .replace("_", "-")
         .replace(".", "-")
         .replace("[", "-")
         .replace("]", "")
