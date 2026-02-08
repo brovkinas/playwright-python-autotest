@@ -61,7 +61,7 @@ jobs:
       - name: Run tests
         continue-on-error: true
         run: |
-          pytest --alluredir=allure-results
+          pytest
 
       # -------------------------
       # Copy history for Trends
