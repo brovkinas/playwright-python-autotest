@@ -1,6 +1,4 @@
 from pathlib import Path
-from _pytest.nodes import Item
-from core.stash_keys import PW_OUTPUT_DIR
 
 
 def project_root(
@@ -19,19 +17,3 @@ def project_root(
         current = current.parent
 
     raise RuntimeError("Project root not found")
-
-
-def nodeid_to_dir_path(item: Item) -> Path:
-
-    output_dir = item.config.stash[PW_OUTPUT_DIR]
-
-    name = item.nodeid
-    name = (
-        name.replace("::", "-")
-        .replace("/", "-")
-        .replace(".", "-")
-        .replace("[", "-")
-        .replace("]", "")
-    )
-
-    return Path(output_dir) / name
