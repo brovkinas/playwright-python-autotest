@@ -11,10 +11,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   tests:
     timeout-minutes: 15
@@ -26,16 +22,6 @@ jobs:
       # -------------------------
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # -------------------------
-      # Checkout gh-pages (history)
-      # -------------------------
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
 
       # -------------------------
       # Setup Python
@@ -62,20 +48,6 @@ jobs:
         continue-on-error: true
         run: |
           pytest
-
-      # -------------------------
-      # Copy history for Trends
-      # -------------------------
-      - name: Copy Allure history
-        if: always()
-        run: |
-          if [ -d "gh-pages/history" ]; then
-            echo "History found. Copying..."
-            mkdir -p allure-results/history
-            cp -r gh-pages/history/* allure-results/history
-          else
-            echo "No previous history found"
-          fi
 
       # -------------------------
       # Upload RAW artifacts
