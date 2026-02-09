@@ -1,9 +1,12 @@
+import re
+
 import allure  # noqa
 import pytest
 import logging
 
 from pages.page_factory.factory import PagesFactory
 from core.logger import setup_logger
+from utils.helpers import get_pw_artifacts_dir
 
 pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
 
@@ -31,13 +34,14 @@ def session_logger():
 @pytest.fixture(scope="function", autouse=True)
 def test_context(request):
     logger = logging.getLogger("autotests")
-    nodeid = request.node.nodeid.replace("::", "_").replace("/", "_").replace(".", "_")
+    nodeid = request.node.nodeid
+    node_id = re.sub(r"[^a-zA-Z0-9]+", "-", nodeid).strip("-")
 
-    logger.info(f"Start test: {nodeid}")
+    logger.info(f"Start test: {node_id}")
 
     yield
 
-    logger.info(f"Finish test: {nodeid}")
+    logger.info(f"Finish test: {node_id}")
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -66,4 +70,13 @@ def allure_attach_on_failure(request):
         if video.stat().st_size > 0:
             allure.attach.file(
                 video, name="Video", attachment_type=allure.attachment_type.MP4
+            )
+
+    # Trace attach
+    aftifacts_dir = get_pw_artifacts_dir(request)
+
+    for trace in aftifacts_dir.glob("*.zip"):
+        if trace.stat().st_size > 0:
+            allure.attach.file(
+                trace, name="Trace", attachment_type=allure.attachment_type.HTML
             )
