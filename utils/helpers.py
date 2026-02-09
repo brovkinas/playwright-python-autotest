@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -17,3 +18,19 @@ def project_root(
         current = current.parent
 
     raise RuntimeError("Project root not found")
+
+
+def get_pw_artifacts_dir(request) -> Path | None:
+    """
+    converts nodeid format to dir-name-pw-uses-to-save-artifacts
+    """
+    config = request.config
+    output_dir = Path(config.option.output)
+    nodeid = request.node.nodeid
+    nodeid_dir = Path(re.sub(r"[^a-zA-Z0-9]+", "-", nodeid).strip("-"))
+    artifacts_dir = output_dir / nodeid_dir
+
+    if not artifacts_dir.exists():
+        return None
+
+    return artifacts_dir
