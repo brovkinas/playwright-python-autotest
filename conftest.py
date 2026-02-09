@@ -78,5 +78,7 @@ def allure_attach_on_failure(request):
     for trace in aftifacts_dir.glob("*.zip"):
         if trace.stat().st_size > 0:
             allure.attach.file(
-                trace, name="Trace", attachment_type=allure.attachment_type.HTML
+                trace,
+                name="Trace in .html => SaveAs .zip",
+                attachment_type=allure.attachment_type.HTML,
             )
