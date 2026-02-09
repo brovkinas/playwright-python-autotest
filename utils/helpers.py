@@ -1,6 +1,8 @@
 import re
 from pathlib import Path
 
+from pages.page_factory.registry import PAGE_REGISTRY
+
 
 def project_root(
     start: Path = None, markers=("pyproject.toml", "requirements.txt", ".gitignore")
@@ -34,3 +36,8 @@ def get_pw_artifacts_dir(request) -> Path | None:
         return None
 
     return artifacts_dir
+
+
+# page factory debug helper
+def list_registered_pages():
+    return {k.name: v.__name__ for k, v in PAGE_REGISTRY.items()}
