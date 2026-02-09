@@ -7,6 +7,9 @@ import logging
 from pages.page_factory.factory import PagesFactory
 from core.logger import setup_logger
 from utils.helpers import get_pw_artifacts_dir
+from pages.page_factory.auto_discovery import discover_pages
+
+discover_pages()
 
 pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
 
