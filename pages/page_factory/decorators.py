@@ -1,4 +1,3 @@
-# @page_decorator.py
 import logging
 from typing import TypeVar, Type
 
@@ -25,11 +24,7 @@ def register_page(page_type: PageType):
             )
 
         PAGE_REGISTRY[page_type] = cls
-
         cls.PAGE_TYPE = page_type
-
-        if cls.PAGE_TYPE is None:
-            raise RuntimeError("PAGE_TYPE was not assigned")
 
         logger.debug(f"Registered page {cls.__name__} -> {page_type.name}")
 

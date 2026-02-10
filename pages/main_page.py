@@ -1,7 +1,7 @@
 import allure
 
 from pages.base_page import BasePage
-from pages.page_factory.page_decorator import register_page
+from pages.page_factory.decorators import register_page
 from pages.page_factory.page_type import PageType
 
 

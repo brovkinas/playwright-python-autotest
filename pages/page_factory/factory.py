@@ -17,6 +17,6 @@ class PagesFactory:
         page_cls = PAGE_REGISTRY.get(page_type)
 
         if page_cls is None:
-            raise ValueError(f"PageType {page_type.name} is not registered")
+            raise ValueError(f"PageType {page_type.name} not registered")
 
         return page_cls(self.page, self.base_url)

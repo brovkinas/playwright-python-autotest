@@ -9,9 +9,12 @@ from core.logger import setup_logger
 from utils.helpers import get_pw_artifacts_dir
 from pages.page_factory.auto_discovery import discover_pages
 
-discover_pages()
-
 pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
+
+
+@pytest.fixture(scope="session", autouse=True)
+def init_pages():
+    discover_pages()
 
 
 @pytest.fixture(scope="session", autouse=False)
