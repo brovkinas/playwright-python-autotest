@@ -7,24 +7,20 @@ import logging
 from pages.page_factory.factory import PagesFactory
 from core.logger import setup_logger
 from utils.helpers import get_pw_artifacts_dir
-from pages.page_factory.auto_discovery import discover_pages
+from pages.page_factory.auto_discovery import auto_discover_pages
 
 pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
 
 
+# ========== Session scope fixtures ========== #
 @pytest.fixture(scope="session", autouse=True)
 def init_pages():
-    discover_pages()
+    auto_discover_pages()
 
 
 @pytest.fixture(scope="session", autouse=False)
 def base_url(request):
     return request.config.getoption("--base-url")
-
-
-@pytest.fixture(scope="function", autouse=False)
-def pages(page, base_url):
-    return PagesFactory(page, base_url)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -37,17 +33,23 @@ def session_logger():
     logging.shutdown()
 
 
+# ========== Function scope fixtures ========== #
+@pytest.fixture(scope="function", autouse=False)
+def pages(page, base_url):
+    return PagesFactory(page, base_url)
+
+
 @pytest.fixture(scope="function", autouse=True)
 def test_context(request):
     logger = logging.getLogger("autotests")
     nodeid = request.node.nodeid
-    node_id = re.sub(r"[^a-zA-Z0-9]+", "-", nodeid).strip("-")
+    nodeid_clear = re.sub(r"[^a-zA-Z0-9]+", "-", nodeid).strip("-")
 
-    logger.info(f"Start test: {node_id}")
+    logger.info(f"Start test: {nodeid_clear}")
 
     yield
 
-    logger.info(f"Finish test: {node_id}")
+    logger.info(f"Finish test: {nodeid_clear}")
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -88,3 +90,37 @@ def allure_attach_on_failure(request):
                 name="Trace in .html => SaveAs .zip",
                 attachment_type=allure.attachment_type.HTML,
             )
+
+
+@pytest.fixture(scope="function", autouse=True)
+def page_events_logger(request, page):
+    """
+    Includes Playwright events into global logger.
+    - console.log
+    - network request/response
+    - page errors
+    """
+    logger = logging.getLogger("autotests")
+
+    def handle_console(msg):
+        msg_type = msg.type
+        text = msg.text
+        if msg_type in ("log", "debug", "info"):
+            logger.info(f"JS CONSOLE ({msg_type}): {text}")
+        elif msg_type == "warning":
+            logger.warning(f"JS CONSOLE ({msg_type}): {text}")
+        elif msg_type == "error":
+            logger.error(f"JS CONSOLE ({msg_type}): {text}")
+        else:
+            logger.info(f"JS CONSOLE ({msg_type}): {text}")
+
+    page.on("console", handle_console)
+
+    # Network events
+    page.on("request", lambda r: logger.info(f"REQ: {r.method} {r.url}"))
+    page.on("response", lambda r: logger.info(f"RES: {r.status} {r.url}"))
+
+    # Page errors
+    page.on("pageerror", lambda e: logger.error(f"PAGE ERROR: {e}"))
+
+    yield
