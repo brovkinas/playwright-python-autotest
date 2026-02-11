@@ -1,4 +1,4 @@
-import allure
+import allure  # noqa
 
 from pages.base_page import BasePage
 from pages.page_factory.decorators import register_page
@@ -21,11 +21,11 @@ class LoginPage(BasePage):
     def open(self):
         super().open(self.URL)
 
-    @allure.step("Login with username: {username} and password: {password}")
+    @allure.step("Login with user: {username}")
     def login(self, username: str, password: str):
-        self.safe_fill(self.USERNAME_INPUT, username)
-        self.safe_fill(self.PASSWORD_INPUT, password)
-        self.safe_click(self.LOGIN_BUTTON)
+        self.fill(self.USERNAME_INPUT, username)
+        self.fill(self.PASSWORD_INPUT, password)
+        self.click(self.LOGIN_BUTTON)
 
     @allure.step("Expected Successful login message")
     def should_be_logged_in(self):

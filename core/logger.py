@@ -5,11 +5,11 @@ from datetime import datetime
 LOG_DIR = "logs"
 
 
-def setup_logger():
+def setup_logger(name: str = "autotests") -> logging.Logger:
     # Create log dir if not exists
     os.makedirs(LOG_DIR, exist_ok=True)
 
-    logger = logging.getLogger("autotests")
+    logger = logging.getLogger(name)
 
     if logger.handlers:
         return logger

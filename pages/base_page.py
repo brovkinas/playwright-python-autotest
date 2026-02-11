@@ -1,104 +1,87 @@
-import logging
-from time import sleep
-
-from typing import Callable
 from urllib.parse import urljoin
-from playwright.sync_api import Page, expect
+
+import allure
+from playwright.sync_api import Page, expect, Locator
+
 from pages.page_factory.page_type import PageType
 
 
 class BasePage:
 
     PAGE_TYPE: PageType | None = None
-    logger = logging.getLogger("autotests")
 
     def __init__(self, page: Page, base_url: str):
         self.page = page
         self.base_url = base_url
 
+    @allure.step("Open url: {url}")
     def open(self, url: str = ""):
         final_url = urljoin(self.base_url, url)
-        self.page.goto(final_url, wait_until="domcontentloaded", timeout=30000)
+
+        self.page.goto(final_url, wait_until="domcontentloaded", timeout=20000)
+
         expect(self.page).to_have_url(final_url)
 
-    # *** Retry *** #
-    def retry(self, action: Callable, retries: int = 2, delay: float = 1.0):
-        last_error = None
-
-        for attempt in range(retries + 1):
-            try:
-                return action()
-            except Exception as e:
-                last_error = e
-                self.logger.warning(f"Attempt {attempt + 1}/{retries + 1} failed: {e}")
-                sleep(delay)
-
-        raise last_error
-
-    # *** Locator helpers *** #
-    def element(self, locator: str):
+    # ===== Locators ===== #
+    def element(self, locator: str) -> Locator:
         return self.page.locator(locator)
 
-    def all_elements(self, locator: str):
-        pass
+    def first_element(self, locator: str) -> Locator:
+        return self.page.locator(locator).first
 
-    def first_element(self, locator: str):
-        pass
+    def all_elements(self, locator: str) -> Locator:
+        return self.page.locator(locator)
 
-    # *** Waits *** #
-    def wait_element_visible_and_enabled(self, locator: str):
-        element = self.element(locator)
-        expect(element).to_be_visible()
-        expect(element).to_be_enabled()
-        return element
-
-    # *** Assertions *** #
+    # ===== Assertions ===== #
+    @allure.step("Element {locator} should be visible")
     def should_be_visible(self, locator: str):
         expect(self.element(locator)).to_be_visible()
 
+    @allure.step("Element {locator} should NOT be visible")
     def should_not_be_visible(self, locator: str):
         expect(self.element(locator)).not_to_be_visible()
 
+    @allure.step("Element {locator} should be enabled")
     def should_be_enabled(self, locator: str):
         expect(self.element(locator)).to_be_enabled()
 
+    @allure.step("Element {locator} should NOT be enabled")
     def should_not_be_enabled(self, locator: str):
         expect(self.element(locator)).not_to_be_enabled()
 
+    @allure.step("Element {locator} should have text {text}")
     def should_contain_text(self, locator: str, text: str):
         expect(self.element(locator)).to_contain_text(text)
 
+    @allure.step("Expected title: {expected_title}")
     def should_have_title(self, expected_title: str):
         expect(self.page).to_have_title(expected_title)
 
-    # *** Safe actions *** #
-    def safe_click(self, locator: str):
-        def action():
-            element = self.wait_element_visible_and_enabled(locator)
-            element.scroll_into_view_if_needed()
-            element.click()
+    # ===== Actions ===== #
+    @allure.step("Click element: {locator}")
+    def click(self, locator: str):
+        self.element(locator).click()
 
-        self.retry(action)
+    @allure.step("Fill element {locator} with value {value}")
+    def fill(self, locator: str, value: str):
+        self.element(locator).fill(value)
 
-    def safe_fill(self, locator: str, value: str):
-        def action():
-            element = self.wait_element_visible_and_enabled(locator)
-            element.scroll_into_view_if_needed()
-            element.fill(value)
+    @allure.step("Hover over element: {locator}")
+    def hover(self, locator: str):
+        self.element(locator).hover()
 
-        self.retry(action)
+    @allure.step("Double click element: {locator}")
+    def double_click(self, locator: str):
+        self.element(locator).dblclick()
 
-    def safe_hover(self, locator: str):
-        pass
+    @allure.step("Check checkbox: {locator}")
+    def check(self, locator: str):
+        self.element(locator).check()
 
-    def safe_double_click(self, locator: str):
-        pass
+    @allure.step("Uncheck checkbox: {locator}")
+    def uncheck(self, locator: str):
+        self.element(locator).uncheck()
 
-    def safe_check(self, locator: str):
-        pass
-
-    def safe_uncheck(self, locator: str):
-        pass
-
-    def safe_select_option(self, locator: str, option: str):
-        pass
+    @allure.step("Select option {option} in {locator}")
+    def select_option(self, locator: str, option: str):
+        self.element(locator).select_option(option)

@@ -1,4 +1,4 @@
-import allure
+import allure  # noqa
 
 from pages.base_page import BasePage
 from pages.page_factory.decorators import register_page
@@ -14,6 +14,6 @@ class MainPage(BasePage):
     def open(self):
         super().open(self.URL)
 
-    @allure.step(f'Main page should have title "{EXPECTED_TITLE}"')
+    @allure.step("Main page should have title")
     def should_have_title(self):
         super().should_have_title(self.EXPECTED_TITLE)

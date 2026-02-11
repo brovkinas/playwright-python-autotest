@@ -6,7 +6,7 @@ import pages
 logger = logging.getLogger("autotests")
 
 
-def discover_pages() -> None:
+def auto_discover_pages() -> None:
 
     for module_info in pkgutil.walk_packages(
         pages.__path__,
