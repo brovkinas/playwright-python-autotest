@@ -1,8 +1,8 @@
 from playwright.sync_api import Page
 
 from pages.base_page import BasePage
-from pages.page_factory.registry import PAGE_REGISTRY
-from pages.page_factory.page_type import PageType
+from core.page_factory.registry import PAGE_REGISTRY
+from core.page_factory.page_type import PageType
 
 
 class PagesFactory:

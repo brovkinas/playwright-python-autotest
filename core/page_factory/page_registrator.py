@@ -2,8 +2,8 @@ import logging
 from typing import TypeVar, Type
 
 from pages.base_page import BasePage
-from pages.page_factory.page_type import PageType
-from pages.page_factory.registry import PAGE_REGISTRY
+from core.page_factory.page_type import PageType
+from core.page_factory.registry import PAGE_REGISTRY
 
 T = TypeVar("T", bound=BasePage)
 logger = logging.getLogger("autotests")
