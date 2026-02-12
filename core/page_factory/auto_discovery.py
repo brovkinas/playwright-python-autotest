@@ -5,8 +5,15 @@ import pages
 
 logger = logging.getLogger("autotests")
 
+_DISCOVERED = False
+
 
 def auto_discover_pages() -> None:
+
+    global _DISCOVERED
+    if _DISCOVERED:
+        return
+    _DISCOVERED = True
 
     for module_info in pkgutil.walk_packages(
         pages.__path__,
@@ -14,7 +21,8 @@ def auto_discover_pages() -> None:
     ):
         module_name = module_info.name
 
-        if ".page_factory." in module_name or not module_name.endswith("_page"):
+        # if ".page_factory." in module_name or not module_name.endswith("_page"):
+        if not module_name.split(".")[-1].endswith("_page"):
             continue
 
         try:

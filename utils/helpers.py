@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from pages.page_factory.registry import PAGE_REGISTRY
+from core.page_factory.registry import PAGE_REGISTRY
 
 
 def project_root(
