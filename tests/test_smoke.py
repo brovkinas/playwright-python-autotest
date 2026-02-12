@@ -1,6 +1,6 @@
 import allure  # noqa
 
-from pages.page_factory.page_type import PageType
+from core.page_factory.page_type import PageType
 
 
 @allure.epic("SmokeTest")
