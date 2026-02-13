@@ -89,7 +89,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-
       # -------------------------
       # Restore history from allure-history branch
       # -------------------------
@@ -100,7 +99,7 @@ jobs:
 
           if git ls-remote --exit-code --heads origin allure-history; then
             echo "allure-history branch exists. Restoring..."
-            git clone --depth 1 --branch allure-history https://github.com/${{ github.repository }}.git allure-history
+            git clone --depth 1 --branch allure-history https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git allure-history
             if [ -d "allure-history/history" ]; then
               mkdir -p allure-results/history
               cp -r allure-history/history/* allure-results/history/ || true
@@ -128,25 +127,18 @@ jobs:
       # -------------------------
       # Update allure-history branch
       # -------------------------
-      - name: Checkout allure-history branch
-        if: always()
-        uses: actions/checkout@v4
-        with:
-          ref: allure-history
-          path: allure-history
-        continue-on-error: true
-
       - name: Update Allure history branch
         if: always()
         run: |
-          cd allure-history || mkdir allure-history && cd allure-history
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p allure-history
+          cd allure-history
 
           if [ ! -d ".git" ]; then
             git init
             git checkout -b allure-history
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          else
+            git checkout allure-history || git checkout -b allure-history
           fi
 
           git rm -rf . || true
@@ -154,9 +146,8 @@ jobs:
           cp -r ../allure-report/history/* history/ || true
 
           git add history
-          git commit -m "Update Allure history (run ${{ github.run_number }})" || echo "No changes"
+          git commit -m "Update Allure history (run ${{ github.run_number }})" || echo "No changes to commit"
           git push origin allure-history
-
 
       # -------------------------
       # Deploy to GitHub Pages
