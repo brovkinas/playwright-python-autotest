@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -79,6 +79,48 @@ jobs:
           curl -Ls https://github.com/allure-framework/allure2/releases/download/2.36.0/allure-2.36.0.tgz | sudo tar -xz -C /opt/
           sudo ln -sf /opt/allure-2.36.0/bin/allure /usr/bin/allure
           allure --version
+
+      # -------------------------
+      # Ensure gh-pages branch exists
+      # -------------------------
+      - name: Ensure gh-pages branch exists
+        if: always()
+        run: |
+          git fetch origin
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            echo "gh-pages exists"
+          else
+            echo "gh-pages does not exist. Creating..."
+            git checkout --orphan gh-pages
+            git reset --hard
+            git commit --allow-empty -m "Initialize gh-pages branch"
+            git push origin gh-pages
+            git checkout main
+          fi
+
+      # -------------------------
+      # Checkout gh-pages branch
+      # -------------------------
+      - name: Checkout gh-pages branch
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # -------------------------
+      # Copy Allure history
+      # -------------------------
+      - name: Copy Allure history
+        if: always()
+        run: |
+          if [ -d "gh-pages/history" ]; then
+            echo "History found. Copying..."
+            mkdir -p allure-results/history
+            cp -r gh-pages/history/* allure-results/history/
+          else
+            echo "No history yet"
+          fi
 
       # -------------------------
       # Generate Allure report
