@@ -1,4 +1,4 @@
-name: UI Tests with Allure
+name: UI Tests with Pytest Playwright Allure
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -81,6 +81,34 @@ jobs:
           allure --version
 
       # -------------------------
+      # Configure git identity
+      # -------------------------
+      - name: Configure git user
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # -------------------------
+      # Restore history from allure-history branch
+      # -------------------------
+      - name: Restore Allure history
+        if: always()
+        run: |
+          git fetch origin || true
+
+          if git ls-remote --exit-code --heads origin allure-history; then
+            echo "allure-history branch exists. Restoring..."
+            git clone --depth 1 --branch allure-history https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git allure-history
+            if [ -d "allure-history/history" ]; then
+              mkdir -p allure-results/history
+              cp -r allure-history/history/* allure-results/history/ || true
+            fi
+          else
+            echo "No allure-history branch yet. First run?"
+          fi
+
+      # -------------------------
       # Generate Allure report
       # -------------------------
       - name: Generate Allure report
@@ -95,6 +123,31 @@ jobs:
           name: allure-report
           path: allure-report
           retention-days: 7
+
+      # -------------------------
+      # Update allure-history branch
+      # -------------------------
+      - name: Update Allure history branch
+        if: always()
+        run: |
+          mkdir -p allure-history
+          cd allure-history
+
+          if [ ! -d ".git" ]; then
+            git init
+            git checkout -b allure-history
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          else
+            git checkout allure-history || git checkout -b allure-history
+          fi
+
+          git rm -rf . || true
+          mkdir history
+          cp -r ../allure-report/history/* history/ || true
+
+          git add history
+          git commit -m "Update Allure history (run ${{ github.run_number }})" || echo "No changes to commit"
+          git push origin allure-history
 
       # -------------------------
       # Deploy to GitHub Pages
