@@ -1,4 +1,4 @@
-name: UI Tests with Allure
+name: UI Tests with Pytest Playwright Allure
 
 on:
   push:
@@ -81,45 +81,32 @@ jobs:
           allure --version
 
       # -------------------------
-      # Ensure gh-pages branch exists
+      # Configure git identity
       # -------------------------
-      - name: Ensure gh-pages branch exists
+      - name: Configure git user
         if: always()
         run: |
-          git fetch origin
-          if git ls-remote --exit-code --heads origin gh-pages; then
-            echo "gh-pages exists"
-          else
-            echo "gh-pages does not exist. Creating..."
-            git checkout --orphan gh-pages
-            git reset --hard
-            git commit --allow-empty -m "Initialize gh-pages branch"
-            git push origin gh-pages
-            git checkout main
-          fi
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
 
       # -------------------------
-      # Checkout gh-pages branch
+      # Restore history from allure-history branch
       # -------------------------
-      - name: Checkout gh-pages branch
-        if: always()
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-
-      # -------------------------
-      # Copy Allure history
-      # -------------------------
-      - name: Copy Allure history
+      - name: Restore Allure history
         if: always()
         run: |
-          if [ -d "gh-pages/history" ]; then
-            echo "History found. Copying..."
-            mkdir -p allure-results/history
-            cp -r gh-pages/history/* allure-results/history/
+          git fetch origin || true
+
+          if git ls-remote --exit-code --heads origin allure-history; then
+            echo "allure-history branch exists. Restoring..."
+            git clone --depth 1 --branch allure-history https://github.com/${{ github.repository }}.git allure-history
+            if [ -d "allure-history/history" ]; then
+              mkdir -p allure-results/history
+              cp -r allure-history/history/* allure-results/history/ || true
+            fi
           else
-            echo "No history yet"
+            echo "No allure-history branch yet. First run?"
           fi
 
       # -------------------------
@@ -137,6 +124,31 @@ jobs:
           name: allure-report
           path: allure-report
           retention-days: 7
+
+      # -------------------------
+      # Update allure-history branch
+      # -------------------------
+      - name: Update Allure history branch
+        if: always()
+        run: |
+          rm -rf allure-history
+          git clone https://github.com/${{ github.repository }}.git allure-history
+          cd allure-history
+
+          if git show-ref --quiet refs/heads/allure-history; then
+            git checkout allure-history
+          else
+            git checkout --orphan allure-history
+            git rm -rf . || true
+          fi
+
+          rm -rf history
+          mkdir history
+          cp -r ../allure-report/history/* history/ || true
+
+          git add history
+          git commit -m "Update Allure history (run ${{ github.run_number }})" || echo "No changes to commit"
+          git push origin allure-history
 
       # -------------------------
       # Deploy to GitHub Pages
