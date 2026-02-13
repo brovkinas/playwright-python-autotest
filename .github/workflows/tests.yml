@@ -128,27 +128,35 @@ jobs:
       # -------------------------
       # Update allure-history branch
       # -------------------------
+      - name: Checkout allure-history branch
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: allure-history
+          path: allure-history
+        continue-on-error: true
+
       - name: Update Allure history branch
         if: always()
         run: |
-          rm -rf allure-history
-          git clone https://github.com/${{ github.repository }}.git allure-history
-          cd allure-history
+          cd allure-history || mkdir allure-history && cd allure-history
 
-          if git show-ref --quiet refs/heads/allure-history; then
-            git checkout allure-history
-          else
-            git checkout --orphan allure-history
-            git rm -rf . || true
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ ! -d ".git" ]; then
+            git init
+            git checkout -b allure-history
           fi
 
-          rm -rf history
+          git rm -rf . || true
           mkdir history
           cp -r ../allure-report/history/* history/ || true
 
           git add history
-          git commit -m "Update Allure history (run ${{ github.run_number }})" || echo "No changes to commit"
+          git commit -m "Update Allure history (run ${{ github.run_number }})" || echo "No changes"
           git push origin allure-history
+
 
       # -------------------------
       # Deploy to GitHub Pages
