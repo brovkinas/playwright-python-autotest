@@ -16,6 +16,14 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-22.04
 
+    env:
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      USER_USERNAME: ${{ secrets.USER_USERNAME }}
+      USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+      USER_WRONG_USERNAME: ${{ secrets.USER_WRONG_USERNAME }}
+      USER_WRONG_PASSWORD: ${{ secrets.USER_WRONG_PASSWORD }}
+
     steps:
       # -------------------------
       # Checkout source
