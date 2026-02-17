@@ -4,6 +4,8 @@ import allure  # noqa
 import pytest
 import logging
 
+from dotenv import load_dotenv
+
 from core.page_factory.factory import PagesFactory
 from core.logger import setup_logger
 from utils.helpers import get_pw_artifacts_dir
@@ -16,6 +18,11 @@ pytest_plugins = ["pytest_plugins.allure_hooks", "pytest_plugins.pytest_hooks"]
 @pytest.fixture(scope="session", autouse=True)
 def init_pages():
     auto_discover_pages()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def init_dotenv():
+    load_dotenv()
 
 
 @pytest.fixture(scope="session", autouse=False)
