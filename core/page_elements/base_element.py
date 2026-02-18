@@ -4,9 +4,10 @@ from playwright.sync_api import Locator, expect
 
 class BaseElement:
 
-    def __init__(self, locator: Locator, name: str):
+    def __init__(self, locator: Locator, name: str, is_secret: bool = False):
         self._locator = locator
         self.name = name
+        self.is_secret = is_secret
 
     # =============================
     # ========== Actions ==========

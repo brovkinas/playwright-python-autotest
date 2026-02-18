@@ -1,6 +1,7 @@
 import allure  # noqa
 from playwright.sync_api import Page
 
+from config.credentials import Credentials
 from core.enums.login_messages import LoginMessages
 from core.page_elements.buton import Button
 from core.page_factory.page_registrator import register_page
@@ -19,7 +20,9 @@ class LoginPage(BasePage):
         super().__init__(page, base_url)
 
         self.username_input = Input(page.locator("#username"), "Username input")
-        self.password_input = Input(page.locator("#password"), "Password input")
+        self.password_input = Input(
+            page.locator("#password"), "Password input", is_secret=True
+        )
         self.login_button = Button(
             page.locator("button[type='submit']"), "Login button"
         )
@@ -29,10 +32,10 @@ class LoginPage(BasePage):
     def open(self):
         super().open(self.URL)
 
-    @allure.step("Login with user: {username}")
-    def login(self, username: str, password: str):
-        Input.fill(self.username_input, username)
-        Input.fill(self.password_input, password)
+    @allure.step(f"User login")
+    def user_login(self, credentials: Credentials):
+        Input.fill(self.username_input, credentials.username)
+        Input.fill(self.password_input, credentials.password)
         Input.click(self.login_button)
 
     @allure.step("Expected Successful login message")
